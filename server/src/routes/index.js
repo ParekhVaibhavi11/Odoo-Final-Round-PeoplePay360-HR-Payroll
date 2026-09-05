@@ -17,7 +17,16 @@ const adminRoutes = require('../modules/admin/admin.routes');
 
 router.use('/auth', authRoutes);
 router.use('/employees', employeeRoutes);
-
+router.use('/contracts', contractRoutes);
+router.use('/schedules', scheduleRoutes);
+router.use('/attendance', attendanceRoutes);
+router.use('/time-off', timeOffRoutes);
+router.use('/salary-structures', salaryStructureRoutes);
+router.use('/salary-rules', salaryRuleRoutes);
+router.use('/payroll', payrollRoutes);
+router.use('/dashboard', dashboardRoutes);
+router.use('/reports', reportRoutes);
+router.use('/notifications', notificationRoutes);
 router.use('/admin', adminRoutes);
 
 module.exports = router;
