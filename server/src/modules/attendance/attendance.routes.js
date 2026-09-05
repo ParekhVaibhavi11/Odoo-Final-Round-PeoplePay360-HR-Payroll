@@ -10,6 +10,7 @@ const { ROLES } = require('../../config/constants');
 router.use(authenticate);
 
 router.get('/', attendanceController.getAttendances);
+router.post('/', authorize(ROLES.HR_MANAGER, ROLES.HR_PAYROLL_MANAGER, ROLES.ADMIN), attendanceController.createAttendance);
 router.post('/check-in', validate(attendanceValidation.validateCheckIn), attendanceController.checkIn);
 router.post('/check-out', validate(attendanceValidation.validateCheckOut), attendanceController.checkOut);
 router.put('/:id', authorize(ROLES.HR_MANAGER, ROLES.HR_PAYROLL_MANAGER, ROLES.ADMIN), validate(attendanceValidation.validateManualCorrection), attendanceController.manualCorrection);

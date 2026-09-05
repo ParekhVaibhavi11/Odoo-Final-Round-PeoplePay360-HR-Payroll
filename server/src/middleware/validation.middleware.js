@@ -1,25 +1,19 @@
-function validate(schema) {
+const ApiError = require('../utils/ApiError');
+
+/**
+ * Higher-order middleware function to run validation rules
+ * @param {Function} validatorFn - Function accepting (req.body, req.params, req.query) returning errors array
+ */
+const validate = (validatorFn) => {
   return (req, res, next) => {
-    const result = schema.safeParse(req.body);
-
-    if (!result.success) {
-      const errors = result.error.issues.map((issue) => ({
-        field: issue.path.join("."),
-        message: issue.message,
-      }));
-
-      return res.status(400).json({
-        success: false,
-        message: "Validation failed",
-        errors,
-      });
+    const errors = validatorFn(req.body, req.params, req.query);
+    if (errors && errors.length > 0) {
+      return next(new ApiError(400, 'Validation Error', errors));
     }
-
-    // Replace body with validated and cleaned data
-    req.body = result.data;
-
     next();
   };
-}
+};
 
-module.exports = validate;
+module.exports = {
+  validate,
+};

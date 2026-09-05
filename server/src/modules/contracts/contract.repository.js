@@ -73,13 +73,14 @@ const findActiveContractForPeriod = async (employeeId, periodStart, periodEnd) =
 };
 
 const findOverlappingActiveContracts = async (employeeId, startDate, endDate, excludeId = null) => {
+  const endDateVal = endDate && String(endDate).trim() !== '' ? endDate : null;
   let sql = `
     SELECT * FROM contracts
     WHERE employee_id = $1 AND status = 'ACTIVE'
       AND start_date <= COALESCE($3, '9999-12-31'::date)
       AND (end_date IS NULL OR end_date >= $2)
   `;
-  const params = [employeeId, startDate, endDate];
+  const params = [employeeId, startDate, endDateVal];
 
   if (excludeId) {
     sql += ` AND id != $4`;
@@ -92,6 +93,8 @@ const findOverlappingActiveContracts = async (employeeId, startDate, endDate, ex
 
 const create = async (data) => {
   const { employee_id, start_date, end_date, wage, salary_structure_id, department, job_position, status } = data;
+  const endDateVal = end_date && String(end_date).trim() !== '' ? end_date : null;
+
   const sql = `
     INSERT INTO contracts (employee_id, start_date, end_date, wage, salary_structure_id, department, job_position, status)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -100,7 +103,7 @@ const create = async (data) => {
   const res = await query(sql, [
     employee_id,
     start_date,
-    end_date || null,
+    endDateVal,
     wage,
     salary_structure_id || null,
     department,
@@ -112,6 +115,8 @@ const create = async (data) => {
 
 const update = async (id, data) => {
   const { start_date, end_date, wage, salary_structure_id, department, job_position, status } = data;
+  const endDateVal = end_date && String(end_date).trim() !== '' ? end_date : null;
+
   const sql = `
     UPDATE contracts
     SET start_date = $1, end_date = $2, wage = $3, salary_structure_id = $4,
@@ -121,7 +126,7 @@ const update = async (id, data) => {
   `;
   const res = await query(sql, [
     start_date,
-    end_date || null,
+    endDateVal,
     wage,
     salary_structure_id || null,
     department,
