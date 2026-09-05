@@ -1,13 +1,15 @@
 const express = require("express");
 
+const routes = require("./src/routes");
+const errorHandler = require("./src/middleware/error.middleware");
+
 const app = express();
 
-
+// Body parsers
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
 
-
+// Root route
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -15,7 +17,7 @@ app.get("/", (req, res) => {
   });
 });
 
-
+// Health check
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
@@ -23,7 +25,10 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// API routes
+app.use("/api", routes);
 
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -31,14 +36,7 @@ app.use((req, res) => {
   });
 });
 
-
-app.use((err, req, res, next) => {
-  console.error("❌ Error:", err);
-
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
-});
+// Global error handler
+app.use(errorHandler);
 
 module.exports = app;
