@@ -12,7 +12,7 @@ module.exports = {
     port: parseInt(process.env.DB_PORT || '5432', 10),
     name: process.env.DB_NAME || 'peoplepay360',
     user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
+    password: process.env.DB_PASSWORD || 'falguni',
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'peoplepay360_super_secret_jwt_key_2026',
