@@ -1,26 +1,25 @@
-const app = require("./app");
-const pool = require("./src/config/db");
-const { PORT } = require("./src/config/env");
+const app = require('./app');
+const env = require('./config/env');
+const { pool } = require('./config/database');
 
-const port = PORT;
-
-async function startServer() {
+const startServer = async () => {
   try {
-    
-    await pool.query("SELECT 1");
+    // Verify DB connectivity
+    const res = await pool.query('SELECT NOW()');
+    console.log(`Connected to PostgreSQL Database [${env.db.name}] successfully at ${res.rows[0].now}`);
 
-    console.log("✅ Database connection successful");
-    
-    app.listen(port, () => {
-      console.log(`🚀 PeoplePay360 server running on port ${port}`);
-      console.log(`🌐 http://localhost:${port}`);
+    app.listen(env.port, () => {
+      console.log(`====================================================`);
+      console.log(`  PeoplePay360 Backend API Server Running          `);
+      console.log(`  Environment: ${env.nodeEnv}                      `);
+      console.log(`  Listening on Port: ${env.port}                   `);
+      console.log(`  Client URL Allowed: ${env.clientUrl}             `);
+      console.log(`====================================================`);
     });
   } catch (error) {
-    console.error("❌ Failed to start server");
-    console.error(error.message);
-
+    console.error('Failed to start backend server due to database connection failure:', error);
     process.exit(1);
   }
-}
+};
 
 startServer();
