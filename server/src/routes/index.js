@@ -21,3 +21,12 @@ router.use('/employees', employeeRoutes);
 router.use('/admin', adminRoutes);
 
 module.exports = router;
+const express = require("express");
+
+const authRoutes = require("./auth.routes");
+
+const router = express.Router();
+
+router.use("/auth", authRoutes);
+
+module.exports = router;
