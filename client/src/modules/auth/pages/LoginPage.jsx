@@ -28,7 +28,7 @@ const LoginPage = () => {
       if (res.data) {
         login(res.data.user, res.data.token);
         showToast(`Welcome back, ${res.data.user.first_name || 'User'}!`, 'success');
-        navigate('/employees');
+        navigate('/dashboard');
       }
     } catch (err) {
       showToast(err.message || 'Invalid credentials', 'error');
