@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { X, Loader2 } from 'lucide-react';
+import api from '../../../config/api';
 
-const EmployeeFormModal = ({ isOpen, onClose, onSave, initialData }) => {
+const EmployeeFormModal = ({ isOpen, onClose, onSave, onDelete, initialData }) => {
+  const [schedules, setSchedules] = useState([]);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -9,13 +11,31 @@ const EmployeeFormModal = ({ isOpen, onClose, onSave, initialData }) => {
     phone: '',
     department: 'Engineering',
     job_position: 'Developer',
+    schedule_id: '',
     status: 'ACTIVE',
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (isOpen) {
+      api.get('/schedules').then((res) => {
+        if (res.data?.items) setSchedules(res.data.items);
+      });
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        first_name: initialData.first_name || '',
+        last_name: initialData.last_name || '',
+        email: initialData.email || '',
+        phone: initialData.phone || '',
+        department: initialData.department || 'Engineering',
+        job_position: initialData.job_position || 'Developer',
+        schedule_id: initialData.schedule_id || '',
+        status: initialData.status || 'ACTIVE',
+      });
     } else {
       setFormData({
         first_name: '',
@@ -24,6 +44,7 @@ const EmployeeFormModal = ({ isOpen, onClose, onSave, initialData }) => {
         phone: '',
         department: 'Engineering',
         job_position: 'Developer',
+        schedule_id: '',
         status: 'ACTIVE',
       });
     }
@@ -54,7 +75,7 @@ const EmployeeFormModal = ({ isOpen, onClose, onSave, initialData }) => {
             <h3 className="text-lg font-bold text-slate-800">
               {initialData ? 'Edit Employee Profile' : 'Create / Add Employee'}
             </h3>
-            <p className="text-xs text-slate-500">Capture employee details and assign department role.</p>
+            <p className="text-xs text-slate-500">Capture employee details and assign working schedule.</p>
           </div>
           <button onClick={onClose} className="p-2 rounded-xl text-slate-400 hover:bg-slate-100">
             <X className="w-5 h-5" />
@@ -136,26 +157,55 @@ const EmployeeFormModal = ({ isOpen, onClose, onSave, initialData }) => {
               />
             </div>
           </div>
+
+          {/* Working Schedule Assignment */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Assigned Schedule</label>
+            <select
+              value={formData.schedule_id}
+              onChange={(e) => setFormData({ ...formData, schedule_id: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-plum-700"
+            >
+              <option value="">Select Working Schedule</option>
+              {schedules.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name} ({s.weekly_hours}h/week)
+                </option>
+              ))}
+            </select>
+          </div>
         </form>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-slate-100 flex items-center justify-end gap-3 bg-slate-50/50">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-5 py-2.5 border border-slate-200 text-slate-600 font-semibold text-sm rounded-xl hover:bg-slate-100"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            form="employee-form"
-            disabled={loading}
-            className="px-5 py-2.5 bg-plum-700 hover:bg-plum-800 text-white font-semibold text-sm rounded-xl shadow-md flex items-center gap-2"
-          >
-            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-            {initialData ? 'Update Employee' : 'Create Employee'}
-          </button>
+        <div className="p-6 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+          {initialData && onDelete ? (
+            <button
+              type="button"
+              onClick={() => onDelete(initialData.id)}
+              className="px-4 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl text-sm font-semibold border border-rose-200"
+            >
+              Delete
+            </button>
+          ) : <div />}
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2.5 border border-slate-200 text-slate-600 font-semibold text-sm rounded-xl hover:bg-slate-100"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="employee-form"
+              disabled={loading}
+              className="px-5 py-2.5 bg-plum-700 hover:bg-plum-800 text-white font-semibold text-sm rounded-xl shadow-md flex items-center gap-2"
+            >
+              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+              {initialData ? 'Update Employee' : 'Create Employee'}
+            </button>
+          </div>
         </div>
 
       </div>

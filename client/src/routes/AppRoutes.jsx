@@ -18,6 +18,7 @@ import SchedulesPage from '../modules/workingSchedules/pages/SchedulesPage';
 import AttendancePage from '../modules/attendance/pages/AttendancePage';
 import TimeOffPage from '../modules/timeOff/pages/TimeOffPage';
 import PayrunsPage from '../modules/payroll/pages/PayrunsPage';
+import StructuresRulesPage from '../modules/payroll/pages/StructuresRulesPage';
 import DashboardPage from '../modules/dashboard/pages/DashboardPage';
 import ReportsPage from '../modules/reports/pages/ReportsPage';
 import UserManagementPage from '../modules/admin/pages/UserManagementPage';
@@ -38,15 +39,32 @@ const AppRoutes = () => {
       {/* Protected Application Routes */}
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Navigate to="/employees" replace />} />
-          <Route path="/employees" element={<EmployeesPage />} />
-          <Route path="/contracts" element={<ContractsPage />} />
-          <Route path="/schedules" element={<SchedulesPage />} />
-          <Route path="/attendance" element={<AttendancePage />} />
-          <Route path="/time-off" element={<TimeOffPage />} />
-          <Route path="/payroll" element={<PayrunsPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route element={<ProtectedRoute allowedRoles={MODULE_PERMISSIONS.DASHBOARD} />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
+          <Route element={<ProtectedRoute allowedRoles={MODULE_PERMISSIONS.EMPLOYEES} />}>
+            <Route path="/employees" element={<EmployeesPage />} />
+          </Route>
+          <Route element={<ProtectedRoute allowedRoles={MODULE_PERMISSIONS.CONTRACTS} />}>
+            <Route path="/contracts" element={<ContractsPage />} />
+            <Route path="/schedules" element={<SchedulesPage />} />
+          </Route>
+          <Route element={<ProtectedRoute allowedRoles={MODULE_PERMISSIONS.ATTENDANCE} />}>
+            <Route path="/attendance" element={<AttendancePage />} />
+          </Route>
+          <Route element={<ProtectedRoute allowedRoles={MODULE_PERMISSIONS.TIMEOFF} />}>
+            <Route path="/time-off" element={<TimeOffPage />} />
+          </Route>
+          <Route element={<ProtectedRoute allowedRoles={MODULE_PERMISSIONS.PAYROLL} />}>
+            <Route path="/payroll" element={<PayrunsPage />} />
+          </Route>
+
+          {/* Admin & Manager Restricted Routes */}
+          <Route element={<ProtectedRoute allowedRoles={MODULE_PERMISSIONS.REPORTS} />}>
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/payroll/structures" element={<StructuresRulesPage />} />
+          </Route>
 
           {/* Admin Only Routes */}
           <Route element={<ProtectedRoute allowedRoles={MODULE_PERMISSIONS.ADMIN} />}>
