@@ -5,13 +5,16 @@ const asyncHandler = require('../utils/asyncHandler');
 const { query } = require('../config/database');
 
 const authenticate = asyncHandler(async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new ApiError(401, 'Authentication token missing or invalid');
+  let token = null;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.query && req.query.token) {
+    token = req.query.token;
   }
 
-  const token = authHeader.split(' ')[1];
+  if (!token) {
+    throw new ApiError(401, 'Authentication token missing or invalid');
+  }
 
   try {
     const decoded = jwt.verify(token, env.jwt.secret);

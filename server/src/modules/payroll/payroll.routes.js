@@ -19,6 +19,7 @@ router.put('/payruns/:id/mark-paid', authorize(ROLES.HR_PAYROLL_MANAGER, ROLES.A
 router.delete('/payruns/:id', authorize(ROLES.HR_PAYROLL_MANAGER, ROLES.ADMIN), payrunController.deletePayrun);
 
 // --- Payslips & PDF/Email Endpoints ---
+router.get('/my-payslips', payslipController.getMyPayslips);
 router.get('/payslips/:id', payrunController.getPayrun);
 router.get('/payslips/:id/pdf', payslipController.downloadPayslipPdf);
 router.post('/payslips/:id/email', authorize(ROLES.HR_PAYROLL_USER, ROLES.HR_PAYROLL_MANAGER, ROLES.ADMIN), payslipController.sendPayslipEmail);

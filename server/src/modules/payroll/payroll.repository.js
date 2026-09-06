@@ -172,6 +172,20 @@ const updatePayslipsStatusByPayrun = async (payrunId, status) => {
   await query('UPDATE payslips SET status = $1, updated_at = NOW() WHERE payrun_id = $2', [status, payrunId]);
 };
 
+const findPayslipsByEmployee = async (employeeId) => {
+  const sql = `
+    SELECT ps.*, pr.name as payrun_name, pr.period_start, pr.period_end,
+           ss.name as structure_name
+    FROM payslips ps
+    JOIN payruns pr ON ps.payrun_id = pr.id
+    LEFT JOIN salary_structures ss ON ps.salary_structure_id = ss.id
+    WHERE ps.employee_id = $1
+    ORDER BY ps.id DESC
+  `;
+  const res = await query(sql, [employeeId]);
+  return res.rows;
+};
+
 module.exports = {
   findAllPayruns,
   findPayrunById,
@@ -181,6 +195,7 @@ module.exports = {
   findPayslipsByPayrun,
   findPayslipById,
   findPayslipLines,
+  findPayslipsByEmployee,
   deletePayslipsByPayrun,
   createPayslip,
   createPayslipLines,

@@ -38,8 +38,18 @@ const sendBulkPayslipsEmail = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, result, `Dispatched payslip emails to ${result.sent} employees`));
 });
 
+const getMyPayslips = asyncHandler(async (req, res) => {
+  const employeeId = req.user.employee_id;
+  if (!employeeId) {
+    return res.status(200).json(new ApiResponse(200, [], 'No employee profile linked'));
+  }
+  const payslips = await payrollRepo.findPayslipsByEmployee(employeeId);
+  return res.status(200).json(new ApiResponse(200, payslips, 'Employee payslips retrieved successfully'));
+});
+
 module.exports = {
   getPayslip,
+  getMyPayslips,
   downloadPayslipPdf,
   sendPayslipEmail,
   sendBulkPayslipsEmail,
