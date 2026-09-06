@@ -574,7 +574,8 @@ npm run lint
 
 # 🎥 Demo
 
-**Demo Video:** Coming Soon
+**Demo Video:** 
+https://drive.google.com/file/d/1_oFu_ro7ebiRtg9CuJ20fCwWNz_T_zBM/view?usp=sharing
 
 **Repository:**
 https://github.com/ParekhVaibhavi11/Odoo-Final-Round-PeoplePay360-HR-Payroll
