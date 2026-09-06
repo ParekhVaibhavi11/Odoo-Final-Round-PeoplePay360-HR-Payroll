@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useToast } from '../../../context/ToastContext';
-import { getEmployees, createEmployee, updateEmployee } from '../../../services/employeeService';
+import { getEmployees, createEmployee, updateEmployee, deleteEmployee } from '../../../services/employeeService';
 import EmployeeKanban from '../components/EmployeeKanban';
 import EmployeeTable from '../components/EmployeeTable';
 import EmployeeFormModal from '../components/EmployeeFormModal';
@@ -50,6 +50,17 @@ const EmployeesPage = () => {
       fetchEmployees();
     } catch (err) {
       showToast(err.message || 'Operation failed', 'error');
+    }
+  };
+
+  const handleDeleteEmployee = async (id) => {
+    try {
+      await deleteEmployee(id);
+      showToast('Employee deleted successfully', 'success');
+      setModalOpen(false);
+      fetchEmployees();
+    } catch (err) {
+      showToast(err.message || 'Failed to delete employee', 'error');
     }
   };
 
@@ -161,6 +172,7 @@ const EmployeesPage = () => {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onSave={handleSaveEmployee}
+        onDelete={handleDeleteEmployee}
         initialData={selectedEmployee}
       />
     </div>

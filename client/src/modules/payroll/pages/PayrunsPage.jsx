@@ -92,9 +92,32 @@ const PayrunsPage = () => {
     }
   };
 
-  const handleDownloadPdf = (payslipId) => {
-    const token = localStorage.getItem('peoplepay360_token');
-    window.open(`/api/payroll/payslips/${payslipId}/pdf?token=${token}`, '_blank');
+  const handleDownloadPdf = async (payslipId) => {
+    try {
+      const token = localStorage.getItem('peoplepay360_token');
+      const response = await fetch(`/api/payroll/payslips/${payslipId}/pdf`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download PDF document');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Payslip_${payslipId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      showToast('Payslip PDF downloaded successfully!', 'success');
+    } catch (err) {
+      showToast(err.message || 'Failed to download PDF', 'error');
+    }
   };
 
   const handleSendBulkEmail = async (payrunId) => {
