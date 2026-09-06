@@ -119,6 +119,30 @@ const remove = async (id) => {
   return res.rows[0];
 };
 
+const createManualRecord = async (data) => {
+  const { employee_id, date, check_in, check_out, worked_hours, overtime_hours, status, notes } = data;
+  const sql = `
+    INSERT INTO attendances (employee_id, date, check_in, check_out, worked_hours, overtime_hours, status, notes)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    ON CONFLICT (employee_id, date) DO UPDATE 
+    SET check_in = EXCLUDED.check_in, check_out = EXCLUDED.check_out, 
+        worked_hours = EXCLUDED.worked_hours, overtime_hours = EXCLUDED.overtime_hours,
+        status = EXCLUDED.status, notes = EXCLUDED.notes, updated_at = NOW()
+    RETURNING *
+  `;
+  const res = await query(sql, [
+    employee_id,
+    date,
+    check_in || null,
+    check_out || null,
+    worked_hours || 0,
+    overtime_hours || 0,
+    status || 'PRESENT',
+    notes || null,
+  ]);
+  return res.rows[0];
+};
+
 module.exports = {
   findAll,
   findById,
@@ -126,5 +150,6 @@ module.exports = {
   createOrUpdateCheckIn,
   updateCheckOut,
   manualCorrection,
+  createManualRecord,
   remove,
 };

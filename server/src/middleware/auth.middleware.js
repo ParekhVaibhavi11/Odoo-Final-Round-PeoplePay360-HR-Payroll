@@ -5,13 +5,16 @@ const asyncHandler = require('../utils/asyncHandler');
 const { query } = require('../config/database');
 
 const authenticate = asyncHandler(async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new ApiError(401, 'Authentication token missing or invalid');
+  let token = null;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.query && req.query.token) {
+    token = req.query.token;
   }
 
-  const token = authHeader.split(' ')[1];
+  if (!token) {
+    throw new ApiError(401, 'Authentication token missing or invalid');
+  }
 
   try {
     const decoded = jwt.verify(token, env.jwt.secret);
@@ -37,62 +40,3 @@ const authenticate = asyncHandler(async (req, res, next) => {
 module.exports = {
   authenticate,
 };
-const { verifyAccessToken } = require("../utils/jwt");
-const { findUserById } = require("../repositories/auth.repository");
-
-async function authenticate(req, res, next) {
-  try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        success: false,
-        message: "Authentication required",
-      });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Authentication required",
-      });
-    }
-
-    const decoded = verifyAccessToken(token);
-
-    const user = await findUserById(decoded.userId);
-
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    if (!user.is_active) {
-      return res.status(401).json({
-        success: false,
-        message: "Account is inactive",
-      });
-    }
-
-    req.user = {
-      userId: user.id,
-      email: user.email,
-      roleId: user.role_id,
-      role: user.role_name,
-      mustChangePassword: user.must_change_password,
-    };
-
-    next();
-  } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid or expired access token",
-    });
-  }
-}
-
-module.exports = authenticate;

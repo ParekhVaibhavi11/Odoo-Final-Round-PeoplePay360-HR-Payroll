@@ -48,10 +48,16 @@ const deleteAttendance = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, 'Attendance record deleted successfully'));
 });
 
+const createAttendance = asyncHandler(async (req, res) => {
+  const result = await attendanceService.createAttendance(req.body);
+  return res.status(201).json(new ApiResponse(201, result, 'Attendance record created successfully'));
+});
+
 module.exports = {
   getAttendances,
   checkIn,
   checkOut,
+  createAttendance,
   manualCorrection,
   deleteAttendance,
 };

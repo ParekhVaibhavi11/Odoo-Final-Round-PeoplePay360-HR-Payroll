@@ -70,10 +70,32 @@ const deleteAttendance = async (id) => {
   return await attendanceRepo.remove(id);
 };
 
+const createAttendance = async (data) => {
+  const employee = await employeeRepo.findById(data.employee_id);
+  if (!employee) {
+    throw new ApiError(404, 'Employee record not found');
+  }
+
+  let workedHours = data.worked_hours;
+  if (data.check_in && data.check_out && (workedHours === undefined || workedHours === null)) {
+    workedHours = calculateHoursWorked(data.check_in, data.check_out);
+  }
+
+  const standardDailyHours = employee.weekly_hours ? parseFloat((employee.weekly_hours / 5).toFixed(2)) : 8.0;
+  const overtimeHours = (workedHours || 0) > standardDailyHours ? parseFloat(((workedHours || 0) - standardDailyHours).toFixed(2)) : 0;
+
+  return await attendanceRepo.createManualRecord({
+    ...data,
+    worked_hours: workedHours || 0,
+    overtime_hours: overtimeHours,
+  });
+};
+
 module.exports = {
   getAllAttendances,
   checkIn,
   checkOut,
+  createAttendance,
   manualCorrection,
   deleteAttendance,
 };
